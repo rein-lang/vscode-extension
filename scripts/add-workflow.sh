@@ -1,8 +1,9 @@
 #!/bin/sh
 # Usage: add-workflow.sh <repo>
-# Writes .github/workflows/publish.yml: a v* tag runs the tests, checks the
-# tag matches package.json, and publishes with Marketplace trusted
-# publishing (GitHub OIDC). Also keeps .github/ out of the vsix.
+# Writes .github/workflows/publish.yml: a merge to main runs the tests and
+# publishes the package.json version when the Marketplace lacks it, then
+# tags it. Auth is Marketplace trusted publishing (GitHub OIDC). Also keeps
+# .github/ out of the vsix.
 set -eu
 repo=$1
 mkdir -p "$repo/.github/workflows"
@@ -23,16 +24,20 @@ else
       - run: npm test --if-present'
 fi
 cat > "$repo/.github/workflows/publish.yml" <<YML
-# Publishes the extension to the VS Code Marketplace when a v* tag is pushed.
-# Auth is Marketplace trusted publishing (GitHub OIDC), so no token is stored.
+# A merge to main publishes the package.json version to the VS Code
+# Marketplace when that version is not there yet, then tags it. A release
+# is a merged version bump. Auth is Marketplace trusted publishing (GitHub
+# OIDC), so no token is stored.
 name: Publish
 
 on:
   push:
-    tags: ["v*"]
+    branches: [main]
+
+concurrency: publish
 
 permissions:
-  contents: read
+  contents: write
   id-token: write
 
 jobs:
@@ -41,9 +46,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 $setup
-      - name: Check tag matches package.json version
-        run: test "v\$(node -p 'require("./package.json").version')" = "\$GITHUB_REF_NAME"
       - run: npx --yes @vscode/vsce publish --oidc --skip-duplicate
+      - name: Tag the version
+        run: |
+          v="v\$(node -p 'require("./package.json").version')"
+          git ls-remote --exit-code --tags origin "refs/tags/\$v" >/dev/null || {
+            git tag "\$v"
+            git push origin "\$v"
+          }
 YML
 touch "$repo/.vscodeignore"
 grep -qx '.github/' "$repo/.vscodeignore" || echo '.github/' >> "$repo/.vscodeignore"

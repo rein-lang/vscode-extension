@@ -14,7 +14,8 @@ touch "$tmp/ext/pnpm-lock.yaml"
 "$here/add-workflow.sh" "$tmp/ext" > /dev/null
 grep -q -- '--oidc' "$tmp/ext/.github/workflows/publish.yml"
 grep -q 'pnpm install' "$tmp/ext/.github/workflows/publish.yml"
-grep -q 'GITHUB_REF_NAME' "$tmp/ext/.github/workflows/publish.yml"
+grep -q 'branches: \[main\]' "$tmp/ext/.github/workflows/publish.yml"
+grep -q -- '--skip-duplicate' "$tmp/ext/.github/workflows/publish.yml"
 test "$(grep -cx '.github/' "$tmp/ext/.vscodeignore")" = 1
 
 echo '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" fill="#0d9488"/></svg>' > "$tmp/logo.svg"

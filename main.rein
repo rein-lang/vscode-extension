@@ -15,7 +15,7 @@ interface State {
   icon: "set" | "missing";
   /** Does the README tell users to install from the Marketplace? */
   readme: "marketplace" | "local only";
-  /** Is the tag publish workflow on the default branch? */
+  /** Is the publish-on-merge workflow on the default branch? */
   workflow: "merged" | "missing";
   /** Is the package.json version live on the Marketplace? */
   listing: "live" | "not live";

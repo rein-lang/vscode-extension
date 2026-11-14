@@ -10,8 +10,9 @@ interface Policy {
 }
 
 /**
- * Release the package.json version: the Marketplace must trust the
- * workflow, and the user must want the version public.
+ * Release the package.json version. A merge to main publishes it, so the
+ * merge of the version bump is the user's approval. The Marketplace must
+ * trust the workflow first.
  */
 export default async function release({ repo }: Input) {
   /** Does the Marketplace trust the publish workflow? */
@@ -22,15 +23,6 @@ export default async function release({ repo }: Input) {
 
   if (trust.policy == "missing") {
     return @./release/trust_workflow(repo=repo);
-  }
-
-  /** Does the user want this version public now? */
-  const go: boolean = await request(`Ask the user: publish
-  <publisher>.<name> version <version> from ${repo}/package.json to the
-  public Marketplace now?`);
-
-  if (!go) {
-    return `The user holds the release of ${repo}. Stop.`;
   }
 
   return @./release/publish(repo=repo);

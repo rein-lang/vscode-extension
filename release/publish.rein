@@ -4,23 +4,33 @@ interface Input {
 }
 
 interface Run {
-  /** What did scripts/release.sh report? */
-  result: "published" | "name taken" | "auth failed" | "other failure";
+  /** What did scripts/watch-publish.sh report? */
+  result:
+    | "published"
+    | "not started"
+    | "name taken"
+    | "auth failed"
+    | "other failure";
 }
 
 /**
- * Push the version tag and let the workflow publish. A failure leads to
- * its fix.
+ * Watch the publish run that the merge to main started. A failure leads
+ * to its fix. Nothing here pushes a tag or publishes by hand.
  */
 export default async function publish({ repo }: Input) {
   /** How did the publish run end? */
-  const run: Run = await request(`Run scripts/release.sh ${repo} from
-  this program's folder. It pushes the version tag, waits for
-  publish.yml, and checks the listing.`);
+  const run: Run = await request(`Run scripts/watch-publish.sh ${repo}
+  from this program's folder. It waits for the publish run of the
+  default branch head and checks the listing.`);
 
   switch (run.result) {
     case "published":
       return @../check_install(repo=repo);
+    case "not started":
+      return askUser(question=`No publish run exists for the head of
+      ${repo}. The version in package.json is not on the Marketplace.
+      Merge a pull request to main, such as the version bump, to start
+      the publish?`);
     case "name taken":
       return @../rename(repo=repo);
     case "auth failed":

@@ -28,7 +28,9 @@ if grep -q "itemName=$id" "$repo/README.md" 2>/dev/null; then readme=marketplace
 
 git -C "$repo" fetch -q origin 2>/dev/null || true
 branch=$(git -C "$repo" symbolic-ref -q --short refs/remotes/origin/HEAD 2>/dev/null || echo origin/main)
-if git -C "$repo" show "$branch:.github/workflows/publish.yml" 2>/dev/null | grep -q -- '--oidc'; then
+# Only the publish-on-merge workflow counts; an older tag workflow is replaced.
+wf=$(git -C "$repo" show "$branch:.github/workflows/publish.yml" 2>/dev/null || true)
+if echo "$wf" | grep -q -- '--oidc' && echo "$wf" | grep -q -- '--skip-duplicate' && echo "$wf" | grep -q 'branches: \[main\]'; then
   workflow=merged
 else
   workflow=missing
