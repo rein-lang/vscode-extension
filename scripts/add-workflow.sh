@@ -45,6 +45,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
 $setup
       - run: npx --yes @vscode/vsce publish --oidc --skip-duplicate
       - name: Tag the version
