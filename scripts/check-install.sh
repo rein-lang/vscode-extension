@@ -34,8 +34,9 @@ others=$(jq -r '.[].relativeLocation' "$ext_dir/extensions.json" 2>/dev/null | w
     | $x' "$f" 2>/dev/null
 done | sort -u | jq -R . | jq -sc .)
 
-latest=$(ls -td "$logs"/*/ 2>/dev/null | head -1)
-last=$(cat "$latest"window*/exthost/exthost.log 2>/dev/null |
+# Each VS Code start makes a new log folder; read them all, so a restart
+# does not hide the last result. Lines start with a timestamp, so sort works.
+last=$(cat "$logs"/*/window*/exthost/exthost.log 2>/dev/null |
   grep -E "_doActivateExtension $id,|Activating extension $id failed" | sort | tail -1 || true)
 case "$last" in
   *failed*) activation=error ;;

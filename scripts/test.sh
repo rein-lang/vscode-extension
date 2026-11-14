@@ -34,5 +34,7 @@ out=$(SKIP_INSTALL=1 VSCODE_EXTENSIONS="$tmp/exts" VSCODE_LOGS="$tmp/logs" "$her
 echo "$out" | grep -q '"activation":"error"'
 echo "$out" | grep -q '"others":\["me.ext-old"\]'
 echo '2026-01-01 10:01:00.000 [info] ExtensionService#_doActivateExtension me.ext, startup: false' >> "$tmp/logs/1/window1/exthost/exthost.log"
+mkdir -p "$tmp/logs/2/window1/exthost"
+echo '2026-01-02 09:00:00.000 [info] ExtensionService#_doActivateExtension other.ext, startup: false' > "$tmp/logs/2/window1/exthost/exthost.log"
 SKIP_INSTALL=1 VSCODE_EXTENSIONS="$tmp/exts" VSCODE_LOGS="$tmp/logs" "$here/check-install.sh" "$tmp/ext" | grep -q '"activation":"ok"'
 echo "scripts ok"
