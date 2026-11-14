@@ -1,0 +1,41 @@
+interface Input {
+  /** The path of the local clone of the VS Code extension repo. */
+  repo: string;
+}
+
+interface Logo {
+  /** Does the project have a logo SVG in this repo or its website repo? */
+  logo: "none" | "has a logo";
+  /** The path of the square logo SVG, or empty. */
+  svg: string;
+}
+
+interface Opened {
+  /** The link of the pull request. */
+  pr: string;
+}
+
+/**
+ * Give the extension a Marketplace icon from the project logo. A project
+ * without a logo gets one from logo-creation first.
+ */
+export default async function add_icon({ repo }: Input) {
+  /** Where is the project logo? */
+  const found: Logo = await request(`Look for the project logo in
+  ${repo} and in the project's website repo next to it: a square or
+  rounded-square SVG first, then any logo SVG.`);
+
+  if (found.logo == "none") {
+    return @logo-creation(project=repo);
+  }
+
+  /** What is the link of the pull request with the icon? */
+  const opened: Opened = await request(`Run scripts/make-icon.sh
+  ${found.svg} ${repo} from this program's folder. It writes
+  images/icon.png at 256 px and images/logo.png. Set package.json
+  \`icon\` to images/icon.png. Put images/logo.png centered above the
+  README title; the Marketplace rejects SVG images in a README. Open a
+  pull request.`);
+
+  return @pr-handling(pr=opened.pr);
+}

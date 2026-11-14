@@ -1,0 +1,32 @@
+interface Input {
+  /** The path of the local clone of the VS Code extension repo. */
+  repo: string;
+}
+
+/**
+ * Let the Marketplace trust the repo's publish workflow, so the workflow
+ * publishes without a stored token.
+ */
+export default async function trust_workflow({ repo }: Input) {
+  /** Does the user approve the trusted publishing policy? */
+  const approve: boolean = await request(`Ask the user to approve a
+  trusted publishing policy: provider GitHub Actions, the owner and repo
+  of ${repo}, workflow publish.yml.`);
+
+  if (!approve) {
+    return `The user did not approve trusted publishing for ${repo}.
+    Nothing is published. Stop.`;
+  }
+
+  /** Is the policy active now? */
+  const made: boolean = await request(`On the Trusted Publishing tab,
+  choose Create. Fill in the owner, the repo and publish.yml. Submit,
+  then read the policy list.`);
+
+  if (!made) {
+    return askUser(question=`The trusted publishing policy for ${repo}
+    was not created. What did the page say?`);
+  }
+
+  return @../release(repo=repo);
+}

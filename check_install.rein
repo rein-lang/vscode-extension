@@ -1,0 +1,59 @@
+interface Input {
+  /** The path of the local clone of the VS Code extension repo. */
+  repo: string;
+}
+
+interface Install {
+  /** Did VS Code install the extension from the Marketplace? */
+  installed: boolean;
+  /** Did the extension start without an error in the VS Code log? */
+  activation: "ok" | "error" | "not opened";
+  /** Is another copy with the same commands installed, such as an old
+   * local build? */
+  duplicate: boolean;
+}
+
+/**
+ * Install the published extension like a user does, and read the VS Code
+ * log to see that it starts.
+ */
+export default async function check_install({ repo }: Input) {
+  /** Does the Marketplace build install and start? */
+  const check: Install = await request(`Run scripts/check-install.sh
+  ${repo} from this program's folder. If it reports activation "not
+  opened", open a file the extension handles in VS Code, wait ten
+  seconds, and run it again.`);
+
+  if (!check.installed) {
+    return askUser(question=`VS Code could not install the extension in
+    ${repo} from the Marketplace. A new listing can take a few minutes.
+    Try again?`);
+  }
+
+  if (check.duplicate) {
+    /** Does the user approve removing the other copy? */
+    const remove: boolean = await request(`Tell the user which other
+    copy of the extension is installed. Ask to uninstall it, so only
+    the Marketplace build runs.`);
+
+    if (remove) {
+      return `Uninstall the other copy with \`code --uninstall-extension
+      <id>\`. Ask the user to reload VS Code windows. Then run
+      vscode-extension again for ${repo}.`;
+    }
+
+    return `The user keeps the other copy. Tell them both copies
+    register the same commands, so one of them fails to start. Stop.`;
+  }
+
+  if (check.activation == "error") {
+    return askUser(question=`The extension in ${repo} failed to start.
+    Read the error in the VS Code log with me and fix it?`);
+  }
+
+  return `The extension in ${repo} is live and starts. Set the GitHub
+  repo homepage to its Marketplace page. Find docs in the project that
+  tell users to build the vsix by hand, and point them to the
+  Marketplace in one pull request. Tell the user the next release is a
+  version bump in package.json and a run of vscode-extension.`;
+}

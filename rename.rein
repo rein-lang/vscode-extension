@@ -1,0 +1,43 @@
+interface Input {
+  /** The path of the local clone of the VS Code extension repo. */
+  repo: string;
+}
+
+interface Name {
+  /** The new package.json `name`, in kebab-case. */
+  name: string;
+  /** The new package.json `displayName`. */
+  display: string;
+  /** Did scripts/check-name.sh find both free? */
+  free: boolean;
+}
+
+interface Opened {
+  /** The link of the pull request. */
+  pr: string;
+}
+
+/**
+ * Pick a new extension name. Marketplace names are unique across all
+ * publishers, so a name another publisher uses cannot be published.
+ */
+export default async function rename({ repo }: Input) {
+  /** Which new name did the user pick, and is it free? */
+  const picked: Name = await request(`Tell the user which name in
+  ${repo}/package.json is taken on the Marketplace, and by which
+  extension. Suggest two free names that keep the project word. Ask the
+  user to pick one. Then run scripts/check-name.sh <name> <display> from
+  this program's folder.`);
+
+  if (!picked.free) {
+    return @./rename(repo=repo);
+  }
+
+  /** What is the link of the pull request with the new name? */
+  const opened: Opened = await request(`In ${repo}, change package.json
+  \`name\` to ${picked.name} and \`displayName\` to ${picked.display}.
+  Change the vsix file name in the README to match. Open a pull
+  request.`);
+
+  return @pr-handling(pr=opened.pr);
+}

@@ -1,0 +1,59 @@
+interface Input {
+  /** The path of the local clone of the VS Code extension repo. */
+  repo: string;
+}
+
+interface Choice {
+  /** Does the user want the publisher from package.json created, or use a
+   * publisher they already own? */
+  choice: "create it" | "use my publisher";
+}
+
+interface Opened {
+  /** The link of the pull request. */
+  pr: string;
+}
+
+/**
+ * Get a Marketplace publisher for the extension. The user signs in;
+ * the agent never types a password.
+ */
+export default async function create_publisher({ repo }: Input) {
+  /** Is the user signed in to the Marketplace manage page? */
+  const signed_in: boolean = await request(`Open
+  https://marketplace.visualstudio.com/manage in the browser. If it asks
+  for a sign-in, ask the user to sign in, and wait for them.`);
+
+  if (!signed_in) {
+    return askUser(question=`The Marketplace needs your sign-in before
+    the extension in ${repo} gets a publisher. Sign in, then run
+    vscode-extension again?`);
+  }
+
+  /** Create the publisher, or use one the user owns? */
+  const pick: Choice = await request(`List the publishers on the manage
+  page. Tell the user that the publisher in ${repo}/package.json does not
+  exist. Ask: create it, or use one of their publishers?`);
+
+  if (pick.choice == "use my publisher") {
+    /** What is the link of the pull request with the new publisher? */
+    const opened: Opened = await request(`Ask the user which publisher to
+    use. In ${repo}, set package.json \`publisher\` to its ID. Open a pull
+    request.`);
+
+    return @pr-handling(pr=opened.pr);
+  }
+
+  /** Did the Marketplace create the publisher? */
+  const created: boolean = await request(`On the manage page, choose
+  Create publisher. Name: the package.json displayName. ID: the
+  package.json publisher. Logo: the extension icon, if it has one. The
+  user agreed to create it, so submit the form.`);
+
+  if (!created) {
+    return askUser(question=`The Marketplace did not create the
+    publisher for ${repo}. What did the page say?`);
+  }
+
+  return @./main(repo=repo);
+}

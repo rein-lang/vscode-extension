@@ -1,0 +1,63 @@
+interface Input {
+  /** The path of the local clone of the VS Code extension repo. */
+  repo: string;
+}
+
+interface State {
+  /** Does the repo have a package.json with an `engines.vscode` field? */
+  manifest: boolean;
+  /** Are the extension name and display name free on the Marketplace, or
+   * already used by this same extension? */
+  name: "free" | "taken";
+  /** Does the publisher in package.json exist on the Marketplace? */
+  publisher: "exists" | "missing";
+  /** Does package.json point `icon` at a PNG file that exists? */
+  icon: "set" | "missing";
+  /** Does the README tell users to install from the Marketplace? */
+  readme: "marketplace" | "local only";
+  /** Is the tag publish workflow on the default branch? */
+  workflow: "merged" | "missing";
+  /** Is the package.json version live on the Marketplace? */
+  listing: "live" | "not live";
+}
+
+/**
+ * Ship a VS Code extension. Each run reads the repo and the Marketplace,
+ * then does the first missing step. Run it again after each step.
+ */
+export default async function main({ repo }: Input) {
+  /** What does the extension already have? */
+  const state: State = await request(`Run scripts/read-state.sh ${repo}
+  from this program's folder. Answer from the JSON it prints.`);
+
+  if (!state.manifest) {
+    return askUser(question=`${repo} has no VS Code extension manifest
+    (a package.json with engines.vscode). Is this the right folder?`);
+  }
+
+  if (state.name == "taken") {
+    return @./rename(repo=repo);
+  }
+
+  if (state.publisher == "missing") {
+    return @./create_publisher(repo=repo);
+  }
+
+  if (state.icon == "missing") {
+    return @./add_icon(repo=repo);
+  }
+
+  if (state.readme == "local only") {
+    return @./write_readme(repo=repo);
+  }
+
+  if (state.workflow == "missing") {
+    return @./add_workflow(repo=repo);
+  }
+
+  if (state.listing == "not live") {
+    return @./release(repo=repo);
+  }
+
+  return @./check_install(repo=repo);
+}

@@ -1,0 +1,23 @@
+interface Input {
+  /** The path of the local clone of the VS Code extension repo. */
+  repo: string;
+}
+
+interface Opened {
+  /** The link of the pull request. */
+  pr: string;
+}
+
+/**
+ * Add the workflow that publishes from a version tag. It uses Marketplace
+ * trusted publishing, so no token is stored in the repo.
+ */
+export default async function add_workflow({ repo }: Input) {
+  /** What is the link of the pull request with the workflow? */
+  const opened: Opened = await request(`Run scripts/add-workflow.sh ${repo}
+  from this program's folder. It writes .github/workflows/publish.yml and
+  keeps .github/ out of the vsix. Open a pull request. A push that adds a
+  workflow file needs a GitHub token with the workflow scope.`);
+
+  return @pr-handling(pr=opened.pr);
+}

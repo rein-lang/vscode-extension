@@ -1,0 +1,35 @@
+interface Input {
+  /** The path of the local clone of the VS Code extension repo. */
+  repo: string;
+}
+
+interface Run {
+  /** What did scripts/release.sh report? */
+  result: "published" | "name taken" | "auth failed" | "other failure";
+}
+
+/**
+ * Push the version tag and let the workflow publish. A failure leads to
+ * its fix.
+ */
+export default async function publish({ repo }: Input) {
+  /** How did the publish run end? */
+  const run: Run = await request(`Run scripts/release.sh ${repo} from
+  this program's folder. It pushes the version tag, waits for
+  publish.yml, and checks the listing.`);
+
+  switch (run.result) {
+    case "published":
+      return @../check_install(repo=repo);
+    case "name taken":
+      return @../rename(repo=repo);
+    case "auth failed":
+      return askUser(question=`The publish run of ${repo} failed to sign
+      in to the Marketplace. Owner, repo and workflow file of the trusted
+      publishing policy must match. Fix it, then run vscode-extension
+      again?`);
+    case "other failure":
+      return askUser(question=`The publish run of ${repo} failed. Read
+      the failed run log with me and fix it?`);
+  }
+}

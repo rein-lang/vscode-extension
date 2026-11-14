@@ -1,0 +1,37 @@
+interface Input {
+  /** The path of the local clone of the VS Code extension repo. */
+  repo: string;
+}
+
+interface Policy {
+  /** Does the publisher have an active trusted publishing policy for this
+   * repo and publish.yml? */
+  policy: "active" | "missing";
+}
+
+/**
+ * Release the package.json version: the Marketplace must trust the
+ * workflow, and the user must want the version public.
+ */
+export default async function release({ repo }: Input) {
+  /** Does the Marketplace trust the publish workflow? */
+  const trust: Policy = await request(`Open the Trusted Publishing tab
+  of the package.json publisher on the Marketplace manage page. Look for
+  an active policy with the owner and repo of ${repo} and the workflow
+  publish.yml.`);
+
+  if (trust.policy == "missing") {
+    return @./release/trust_workflow(repo=repo);
+  }
+
+  /** Does the user want this version public now? */
+  const go: boolean = await request(`Ask the user: publish
+  <publisher>.<name> version <version> from ${repo}/package.json to the
+  public Marketplace now?`);
+
+  if (!go) {
+    return `The user holds the release of ${repo}. Stop.`;
+  }
+
+  return @./release/publish(repo=repo);
+}

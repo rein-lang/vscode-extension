@@ -1,0 +1,25 @@
+interface Input {
+  /** The path of the local clone of the VS Code extension repo. */
+  repo: string;
+}
+
+interface Opened {
+  /** The link of the pull request. */
+  pr: string;
+}
+
+/**
+ * Make the README lead with the Marketplace install, so a reader installs
+ * in one step.
+ */
+export default async function write_readme({ repo }: Input) {
+  /** What is the link of the pull request with the new install section? */
+  const opened: Opened = await request(`In ${repo}/README.md, make the
+  Install section start with a link to
+  https://marketplace.visualstudio.com/items?itemName=<publisher>.<name>
+  and the line \`code --install-extension <publisher>.<name>\`, from
+  package.json. Keep the local vsix build as the second way. Open a pull
+  request.`);
+
+  return @pr-handling(pr=opened.pr);
+}
