@@ -1,6 +1,6 @@
 {
   "name": "vscode-extension",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Ship a VS Code extension: a free name, a publisher, an icon, a Marketplace README, publishing from git tags, and a checked install.",
   "license": "MIT",
   "repository": "github:rein-lang/vscode-extension",
@@ -11,6 +11,6 @@
     "pr-handling": "*"
   },
   "engines": {
-    "rein": "^0.1.0"
+    "rein": "^0.1.2"
   }
 }

@@ -1,3 +1,6 @@
+import { check_install } from "../check_install";
+import { rename } from "../rename";
+
 interface Input {
   /** The path of the local clone of the VS Code extension repo. */
   repo: string;
@@ -25,14 +28,14 @@ export default async function publish({ repo }: Input) {
 
   switch (run.result) {
     case "published":
-      return @../check_install(repo=repo);
+      return check_install(repo=repo);
     case "not started":
       return askUser(question=`No publish run exists for the head of
       ${repo}. The version in package.json is not on the Marketplace.
       Merge a pull request to main, such as the version bump, to start
       the publish?`);
     case "name taken":
-      return @../rename(repo=repo);
+      return rename(repo=repo);
     case "auth failed":
       return askUser(question=`The publish run of ${repo} failed to sign
       in to the Marketplace. Owner, repo and workflow file of the trusted

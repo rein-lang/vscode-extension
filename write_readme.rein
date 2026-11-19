@@ -1,3 +1,5 @@
+import { main } from "pr-handling";
+
 interface Input {
   /** The path of the local clone of the VS Code extension repo. */
   repo: string;
@@ -21,5 +23,5 @@ export default async function write_readme({ repo }: Input) {
   package.json. Keep the local vsix build as the second way. Open a pull
   request.`);
 
-  return @pr-handling(pr=opened.pr);
+  return main(pr=opened.pr);
 }

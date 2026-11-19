@@ -1,3 +1,11 @@
+import { rename } from "./rename";
+import { create_publisher } from "./create_publisher";
+import { add_icon } from "./add_icon";
+import { write_readme } from "./write_readme";
+import { add_workflow } from "./add_workflow";
+import { release } from "./release";
+import { check_install } from "./check_install";
+
 interface Input {
   /** The path of the local clone of the VS Code extension repo. */
   repo: string;
@@ -36,28 +44,28 @@ export default async function main({ repo }: Input) {
   }
 
   if (state.name == "taken") {
-    return @./rename(repo=repo);
+    return rename(repo=repo);
   }
 
   if (state.publisher == "missing") {
-    return @./create_publisher(repo=repo);
+    return create_publisher(repo=repo);
   }
 
   if (state.icon == "missing") {
-    return @./add_icon(repo=repo);
+    return add_icon(repo=repo);
   }
 
   if (state.readme == "local only") {
-    return @./write_readme(repo=repo);
+    return write_readme(repo=repo);
   }
 
   if (state.workflow == "missing") {
-    return @./add_workflow(repo=repo);
+    return add_workflow(repo=repo);
   }
 
   if (state.listing == "not live") {
-    return @./release(repo=repo);
+    return release(repo=repo);
   }
 
-  return @./check_install(repo=repo);
+  return check_install(repo=repo);
 }

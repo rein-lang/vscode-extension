@@ -1,3 +1,6 @@
+import { trust_workflow } from "./release/trust_workflow";
+import { publish } from "./release/publish";
+
 interface Input {
   /** The path of the local clone of the VS Code extension repo. */
   repo: string;
@@ -22,8 +25,8 @@ export default async function release({ repo }: Input) {
   publish.yml.`);
 
   if (trust.policy == "missing") {
-    return @./release/trust_workflow(repo=repo);
+    return trust_workflow(repo=repo);
   }
 
-  return @./release/publish(repo=repo);
+  return publish(repo=repo);
 }

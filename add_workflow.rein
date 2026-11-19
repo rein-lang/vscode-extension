@@ -1,3 +1,5 @@
+import { main } from "pr-handling";
+
 interface Input {
   /** The path of the local clone of the VS Code extension repo. */
   repo: string;
@@ -20,5 +22,5 @@ export default async function add_workflow({ repo }: Input) {
   is replaced. Open a pull request. A push that adds a
   workflow file needs a GitHub token with the workflow scope.`);
 
-  return @pr-handling(pr=opened.pr);
+  return main(pr=opened.pr);
 }
