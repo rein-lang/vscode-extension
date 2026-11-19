@@ -1,3 +1,6 @@
+import { rename as rename2 } from "./rename";
+import { main } from "pr-handling";
+
 interface Input {
   /** The path of the local clone of the VS Code extension repo. */
   repo: string;
@@ -30,7 +33,7 @@ export default async function rename({ repo }: Input) {
   this program's folder.`);
 
   if (!picked.free) {
-    return @./rename(repo=repo);
+    return rename2(repo=repo);
   }
 
   /** What is the link of the pull request with the new name? */
@@ -39,5 +42,5 @@ export default async function rename({ repo }: Input) {
   Change the vsix file name in the README to match. Open a pull
   request.`);
 
-  return @pr-handling(pr=opened.pr);
+  return main(pr=opened.pr);
 }

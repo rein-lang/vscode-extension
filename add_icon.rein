@@ -1,3 +1,6 @@
+import { main } from "logo-creation";
+import { main as prHandling } from "pr-handling";
+
 interface Input {
   /** The path of the local clone of the VS Code extension repo. */
   repo: string;
@@ -26,7 +29,7 @@ export default async function add_icon({ repo }: Input) {
   rounded-square SVG first, then any logo SVG.`);
 
   if (found.logo == "none") {
-    return @logo-creation(project=repo);
+    return main(project=repo);
   }
 
   /** What is the link of the pull request with the icon? */
@@ -37,5 +40,5 @@ export default async function add_icon({ repo }: Input) {
   README title; the Marketplace rejects SVG images in a README. Open a
   pull request.`);
 
-  return @pr-handling(pr=opened.pr);
+  return prHandling(pr=opened.pr);
 }

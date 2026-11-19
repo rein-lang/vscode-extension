@@ -1,3 +1,6 @@
+import { main } from "pr-handling";
+import { main as main2 } from "./main";
+
 interface Input {
   /** The path of the local clone of the VS Code extension repo. */
   repo: string;
@@ -41,7 +44,7 @@ export default async function create_publisher({ repo }: Input) {
     use. In ${repo}, set package.json \`publisher\` to its ID. Open a pull
     request.`);
 
-    return @pr-handling(pr=opened.pr);
+    return main(pr=opened.pr);
   }
 
   /** Did the Marketplace create the publisher? */
@@ -55,5 +58,5 @@ export default async function create_publisher({ repo }: Input) {
     publisher for ${repo}. What did the page say?`);
   }
 
-  return @./main(repo=repo);
+  return main2(repo=repo);
 }
